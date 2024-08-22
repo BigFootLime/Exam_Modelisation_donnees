@@ -169,7 +169,7 @@ WHERE
 
 | Nom de la donnée                | Format         | Longueur | Type        | Règle de calcul | Document |
 | ------------------------------- | -------------- | -------- | ----------- | --------------- | -------- |
-| **athlete_id**                  | Numérique      |          | Élémentaire | Auto-incrément  | -        |
+| **athlete_bib**                 | Numérique      |          | Élémentaire | Auto-incrément  | -        |
 | **athlete_name**                | Alphanumérique | 50       | Élémentaire | -               | -        |
 | **athlete_surname**             | Alphanumérique | 60       | Élémentaire | -               | -        |
 | **athlete_house_no**            | Alphanumérique | 15       | Élémentaire | -               | -        |
@@ -180,8 +180,8 @@ WHERE
 | **athlete_telNo**               | Alphanumérique | 15       | Élémentaire | -               | -        |
 | **athlete_email**               | Alphanumérique | 70       | Élémentaire | -               | -        |
 | **athlete_licence_no**          | Alphanumérique | 20       | Élémentaire | -               | -        |
-| **athlete_club**                | Alphanumérique | 100      | Élémentaire | -               | -        |
 | **athlete_medical_certificate** | Date           |          | Élémentaire | -               | -        |
+| **registration_date**           | Date           |          | Élémentaire | -               | -        |
 | **competition_id**              | Numérique      |          | Élémentaire | Auto-incrément  | -        |
 | **competition_name**            | Alphanumérique | 100      | Élémentaire | -               | -        |
 | **competition_date**            | Date           |          | Élémentaire | -               | -        |
@@ -190,8 +190,151 @@ WHERE
 | **event_type**                  | Alphanumérique | 50       | Élémentaire | -               | -        |
 | **event_distance**              | Numérique      |          | Élémentaire | -               | -        |
 | **event_conditions**            | Alphanumérique | 200      | Élémentaire | -               | -        |
-| **bib_number**                  | Numérique      |          | Élémentaire | -               | -        |
+| **club_id**                     | Numérique      |          | Élémentaire | Auto-increment  | -        |
+| **club_name**                   | Alphanumérique | 50       | Élémentaire | -               | -        |
+| **date_of_affiliation**         | Date           |          | Élémentaire | -               | -        |
+| **aclub_street_no**             | Alphanumérique | 15       | Élémentaire | -               | -        |
+| **club_street_name**            | Alphanumérique | 150      | Élémentaire | -               | -        |
+| **club_postcode**               | Alphanumérique | 11       | Élémentaire | -               | -        |
+| **club_city**                   | Alphanumérique | 30       | Élémentaire | -               | -        |
+| **club_country**                | Alphanumérique | 50       | Élémentaire | -               | -        |
+| **club_telNo**                  | Alphanumérique | 15       | Élémentaire | -               | -        |
 
 ### Puis par le Modele Conceptuel des Données:
 
 ![image_MCD2](ExamExo2MCD.png)
+
+### Puis par le Modele Logique des Données:
+
+![image_MCD2](ExamExo2MLD.png)
+
+### On fini par le Modele Physique des Données:
+
+ATHELETE (<u>athelete_bib</u>, athelete_name, athelete_surname, athelete_house_no, athelete_street_name, athelete_postcode, athelete_city, athelete_country, athelete_telNo, athelete_email, athelete_license_no, athelete_medical_certificate)
+
+CLUB (<u>club_id</u>, club_name, aclub_street_no, club_street_name, club_postcode, club_city, club_country, club_telNo)
+
+COMPETITION (<u>competition_id</u>, competition_name, competition_date, competition_city)
+
+EVENT (<u>event_id</u>, event_type, event_distance, event_conditions)
+
+REGISTER (<u>#athelete_bib, #competition_id</u>, registration_date)
+
+PARTICIPATE (<u>#competition_id, #event_id</u>)
+
+AFFILIATED (<u>#athelete_bib</u>, #club_id, date_of_affiliation)
+<br/>
+<br/>
+
+##### Voici les script POSTGRESQL
+
+```sql
+CREATE DATABASE SportFederation
+
+CREATE TABLE ATHELETE (
+    athelete_bib SERIAL PRIMARY KEY,
+    athelete_name VARCHAR(50) NOT NULL,
+    athelete_surname VARCHAR(50) NOT NULL,
+    athelete_house_no VARCHAR(10),
+    athelete_street_name VARCHAR(100),
+    athelete_postcode VARCHAR(20),
+    athelete_city VARCHAR(50),
+    athelete_country VARCHAR(50),
+    athelete_telNo VARCHAR(20),
+    athelete_email VARCHAR(100),
+    athelete_license_no VARCHAR(50),
+    athelete_medical_certificate DATE NOT NULL
+);
+
+INSERT INTO ATHELETE (athelete_name, athelete_surname, athelete_house_no, athelete_street_name, athelete_postcode, athelete_city, athelete_country, athelete_telNo, athelete_email, athelete_license_no, athelete_medical_certificate)
+VALUES ('John', 'Doe', '123', 'Main St', '12345', 'Plymouth City', ' Country', '123-456-7890', 'john.doe@gmail.com', 'PLY2ER', '2024-09-04');
+
+INSERT INTO ATHELETE (athelete_name, athelete_surname, athelete_house_no, athelete_street_name, athelete_postcode, athelete_city, athelete_country, athelete_telNo, athelete_email, athelete_license_no, athelete_medical_certificate)
+VALUES ('Jane', 'Smith', '456', 'Data St', '67890', 'London', 'UK', '987-654-3210', 'jane.smith@gmail.com', NULL, '2024-09-04');
+
+CREATE TABLE CLUB (
+    club_id SERIAL PRIMARY KEY,
+    club_name VARCHAR(100) NOT NULL,
+    club_street_no VARCHAR(10),
+    club_street_name VARCHAR(100),
+    club_postcode VARCHAR(20),
+    club_city VARCHAR(50),
+    club_country VARCHAR(50),
+    club_telNo VARCHAR(20)
+);
+
+INSERT INTO CLUB (club_name, club_street_no, club_street_name, club_postcode, club_city, club_country, club_telNo)
+VALUES ('Runner Club', '1', 'Runner St', '11111', 'Runner City', 'Runner Country', '111-222-3333');
+
+INSERT INTO CLUB (club_name, club_street_no, club_street_name, club_postcode, club_city, club_country, club_telNo)
+VALUES ('Speedsters', '2', 'Fast Lane', '22222', 'Speed City', 'Speed Country', '222-333-4444');
+
+
+CREATE TABLE COMPETITION (
+    competition_id SERIAL PRIMARY KEY,
+    competition_name VARCHAR(100) NOT NULL,
+    competition_date DATE NOT NULL,
+    competition_city VARCHAR(50)
+);
+
+INSERT INTO COMPETITION (competition_name, competition_date, competition_city)
+VALUES ('Spring Marathon', '2024-04-15', 'Marathon City');
+
+INSERT INTO COMPETITION (competition_name, competition_date, competition_city)
+VALUES ('Summer Triathlon', '2024-07-20', 'Triathlon Town');
+
+CREATE TABLE EVENT (
+    event_id SERIAL PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    event_distance DECIMAL(5, 2),
+    event_conditions TEXT
+);
+
+INSERT INTO EVENT (event_type, event_distance, event_conditions)
+VALUES ('Marathon', 42.195, 'Clear weather, road race');
+
+INSERT INTO EVENT (event_type, event_distance, event_conditions)
+VALUES ('Triathlon', 51.5, 'Swim, Bike, Run');
+
+
+CREATE TABLE REGISTER (
+    athelete_bib INT REFERENCES ATHELETE(athelete_bib) ,
+    competition_id INT REFERENCES COMPETITION(competition_id),
+    registration_date DATE NOT NULL,
+    PRIMARY KEY (athelete_bib, competition_id)
+);
+
+INSERT INTO REGISTER (athelete_bib, competition_id, registration_date)
+VALUES (1, 1, '2024-03-01');
+
+INSERT INTO REGISTER (athelete_bib, competition_id, registration_date)
+VALUES (2, 2, '2024-06-01');
+
+CREATE TABLE PARTICIPATE (
+    competition_id INT REFERENCES COMPETITION(competition_id) ,
+    event_id INT REFERENCES EVENT(event_id),
+    PRIMARY KEY (competition_id, event_id)
+);
+
+INSERT INTO PARTICIPATE (competition_id, event_id)
+VALUES (1, 1);
+
+INSERT INTO PARTICIPATE (competition_id, event_id)
+VALUES (2, 2);
+
+CREATE TABLE AFFILIATED (
+    athelete_bib INT REFERENCES ATHELETE(athelete_bib) ,
+    club_id INT REFERENCES CLUB(club_id),
+    date_of_affiliation DATE NOT NULL,
+    PRIMARY KEY (athelete_bib)
+);
+
+INSERT INTO AFFILIATED (athelete_bib, club_id, date_of_affiliation)
+VALUES (1, 1, '2023-01-15');
+INSERT INTO AFFILIATED (athelete_bib, club_id, date_of_affiliation)
+VALUES (2, 2, '2023-02-20');
+
+
+```
+
+---
